@@ -1,4 +1,4 @@
-from functions import verify_user, calculate_tax, save_to_csv, read_from_csv, check_user_entry
+from functions import verify_user, calculate_tax, save_to_csv, read_from_csv, check_user_entry, calculate_relief, relief_categories,collect_user_reliefs
 import pandas as pd
 
 FILENAME = 'tax_data.csv'
@@ -58,7 +58,22 @@ def main():
 
             try:
                 income = float(input("Enter your annual income: "))
-                relief = float(input("Enter your tax relief amount: "))
+                relief_choice = input("Do you want to claim any tax reliefs?\n1. Yes\n2. No\n Enter your choice (1 / 2): ").strip()
+                if relief_choice == "1":
+                    print("*********************************************\nAvailable Tax Relief Categories: ")
+                    user_reliefs = collect_user_reliefs(relief_categories)
+                    if not user_reliefs:
+                        print("No tax reliefs.")
+                        relief = 0
+                    else:
+                        relief = calculate_relief(user_reliefs)
+                elif relief_choice == "2":
+                    print("Skipping tax reliefs as requested...")
+                    relief = 0
+                else:
+                    print("Invalid choice. Proceeding without tax reliefs.")
+                    relief = 0
+
             except ValueError:
                 print("Please enter valid numbers.")
                 return

@@ -70,3 +70,62 @@ def check_user_entry(user_id, ic_number, filename):
         return True, False
     else:
         return False, False
+
+relief_categories = [
+    ("individual", 9000, "fixed"),
+    ("spouse", 4000, "fixed"),
+    ("child", 8000, "variable"),
+    ("medical", 8000, "fixed"),
+    ("lifestyle", 2500, "fixed"),
+    ("education", 7000, "fixed"),
+    ("parental", 5000, "fixed"),
+]
+
+valid_relief_categories = {r[0] for r in relief_categories}
+
+def calculate_relief(user_reliefs):
+    total_relief = 0
+    claimed = set()
+
+    for relief_name, amount in user_reliefs.items():
+        if relief_name not in valid_relief_categories:
+            continue
+        for category, cap, mode in relief_categories:
+            if relief_name == category:
+                if mode == "fixed":
+                    total_relief += min(amount, cap)
+                    claimed.add(relief_name)
+                elif mode == "variable":
+                    n = min(int(amount), 12)
+                    total_relief += n * cap
+                    claimed.add(relief_name)
+                break
+    return total_relief
+
+def collect_user_reliefs(relief_categories):
+    for idx, (name, cap, mode) in enumerate(relief_categories, start = 1):
+        print(f"{idx}.{name.capitalize()} (Max: RM{cap})")
+
+    chosen = input("\nEnter the numbers of the reliefs you are eligible to claim (separated by commas, e.g. 1,3,5): ")
+    selected_indices = [int(x.strip()) for x in chosen.split(",") if x.strip().isdigit()]
+
+    user_reliefs = {}
+
+    for idx in selected_indices:
+        if 1 <= idx <= len(relief_categories):
+            name, cap, mode = relief_categories[idx - 1]
+            try: 
+                if mode == "variable" and name == "child":
+                    try:
+                        children = int(input("Enter number of children (max 12, 8000 each): "))
+                        user_reliefs[name] = children
+                    except ValueError:
+                        print("Invalid number. Skipped.")
+                else:
+                    amt = float(input(f"Enter amount for {name.capitalize()} relief (Max RM{cap}): "))
+                    user_reliefs[name] = amt
+            except ValueError:
+                print("Invalid input. Amount skipped.")
+        else: 
+            print(f"Invalid selection: {idx}")
+    return user_reliefs
