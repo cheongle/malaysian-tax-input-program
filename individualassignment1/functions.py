@@ -50,3 +50,20 @@ def read_from_csv(filename):
     if not os.path.exists(filename):
         return None
     return pd.read_csv(filename)
+
+def check_user_entry(user_id, ic_number, filename):
+    if not os.path.exists(filename):
+        return True
+    
+    df = pd.read_csv(filename, dtype = {'IC Number': str})
+    df['IC Number'] = df['IC Number']
+
+    match_ic = df[df['IC Number'] == ic_number]
+    match_id = df[df['ID'] == user_id]
+
+    if match_ic.empty and match_id.empty:
+        return True
+    elif not match_ic.empty and match_ic.iloc[0]['ID'] == user_id:
+        return True
+    else:
+        return False

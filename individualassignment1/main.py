@@ -1,23 +1,31 @@
-from functions import verify_user, calculate_tax, save_to_csv, read_from_csv
+from functions import verify_user, calculate_tax, save_to_csv, read_from_csv, check_user_entry
 import pandas as pd
 
 FILENAME = 'tax_data.csv'
 
 def main():
-    print("Welcome to the Malaysian Tax Input Program!")
+    print("Welcome to the Malaysian Tax Input Program! Hello")
 
-    user_id = input("Enter your ID: ")
-    ic = input("Enter your 12-digit IC number without hyphen. (Last 4 digits will be your password): ").zfill(12)
+    while True:
+        user_id = input("Enter your ID: ")
+        ic = input("Enter your 12-digit IC number without hyphen. (Last 4 digits will be your password): ")
 
-    if not verify_user(ic, ic[-4:]):
-        print("Invalid IC format or password!")
-        return
+        if not verify_user(ic, ic[-4:]):
+            print("Invalid IC format or password!\n")
+            continue
+
+        if not check_user_entry(user_id, ic, FILENAME):
+            print("Your ID or IC do not match our existing records. Please Try Again.\n")
+            continue
+
+        break
     
     password = input("Enter password: ")
     
     if not verify_user(ic, password):
-        print("Authentication failed.")
+        print("Authentication failed.\n")
         return
+
     
     try:
         income = float(input("Enter your annual income: "))
