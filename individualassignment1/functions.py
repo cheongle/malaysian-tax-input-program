@@ -44,20 +44,8 @@ def read_from_csv(filename):
         return None
     return pd.read_csv(filename)
 
-def check_existing_record(ic_number, filename):
+def remove_existing_record(ic_number, filename):
     if os.path.exists(filename):
-        df = pd.read_csv(filename, dtype = str)
-        df['IC Number'] = df['IC Number'].astype(str).str.strip()
-        return str(ic_number).strip() in df['IC Number'].values
-    return False
-
-def update_record(data, filename):
-    if os.path.exists(filename):
-        df = pd.read_csv(filename, dtype = str)
-        df['IC Number'] = df['IC Number'].astype(str).str.strip()
-        ic_number = str(data['IC Number']).strip()
-
+        df = pd.read_csv(filename)
         df = df[df['IC Number'] != ic_number]
-        data_str = {k: str(v) for k, v in data.items()}
-        df = pd.concat([df, pd.DataFrame([data_str])], ignore_index = True)
         df.to_csv(filename, index = False)

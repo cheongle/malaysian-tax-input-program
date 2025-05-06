@@ -1,4 +1,4 @@
-from functions import verify_user, calculate_tax, save_to_csv, read_from_csv, check_existing_record, update_record
+from functions import verify_user, calculate_tax, save_to_csv, read_from_csv, remove_existing_record
 import pandas as pd
 
 FILENAME = 'tax_data.csv'
@@ -37,10 +37,8 @@ def main():
         'Tax Payable' : tax
     }
 
-    if check_existing_record(ic, FILENAME):
-        update_record(data, FILENAME)
-    else:
-        save_to_csv(data, FILENAME)
+    remove_existing_record(ic, FILENAME)
+    save_to_csv(data, FILENAME)
 
     print("\nTax Records: ")
     df = read_from_csv(FILENAME)
