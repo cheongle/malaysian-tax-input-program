@@ -35,35 +35,55 @@ def main():
             print("Your user ID and IC have been successfully registered!\n")
         else:
             print("Welcome back!\n")
-
         break
     
-    password = input("Enter password: ").strip()
+    for password in range(3):
+        password = input("Enter password: ").strip()
     
-    if not verify_user(ic, password):
-        print("Authentication failed.\n")
-        return
-
-    try:
-        income = float(input("Enter your annual income: "))
-        relief = float(input("Enter your tax relief amount: "))
-    except ValueError:
-        print("Please enter valid numbers.")
+        if verify_user(ic, password):
+            break
+        else:
+            print("Authentication failed. Try Again")
+    else:
+        print("Too many invalid attempts. Exiting the Program...")
         return
     
-    tax = calculate_tax(income, relief)
-    print(f"Your tax payable is: RM {tax}")
+    while True:
+        print("\nWhat would you like to do next?")
+        print("1. Enter/Update Income & Tax Relief")
+        print("2. View Tax Records Only")
+        next_choice = input("Enter your choice (1 / 2): ").strip()
 
-    data = {
-        'ID' : user_id,
-        'IC Number' : ic,
-        'Income' : income,
-        'Tax Relief' : relief,
-        'Tax Payable' : tax
-    }
+        if next_choice == "1":
 
-    save_to_csv(data, FILENAME)
+            try:
+                income = float(input("Enter your annual income: "))
+                relief = float(input("Enter your tax relief amount: "))
+            except ValueError:
+                print("Please enter valid numbers.")
+                return
+    
+            tax = calculate_tax(income, relief)
+            print(f"Your tax payable is: RM {tax}")
 
+            data = {
+                'ID' : user_id,
+                'IC Number' : ic,
+                'Income' : income,
+                'Tax Relief' : relief,
+                'Tax Payable' : tax
+            }
+
+            save_to_csv(data, FILENAME)
+            break
+
+        elif next_choice == "2":
+            print("\nViewing records...")
+            break
+
+        else:
+            print("Invalid option. Please choose 1 or 2.\n")
+            
     print("*********************************************\nTax Records: ")
     df = read_from_csv(FILENAME)
     if df is not None:
