@@ -1,4 +1,4 @@
-from functions import verify_user, calculate_tax, save_to_csv, read_from_csv, remove_existing_record
+from functions import verify_user, calculate_tax, save_to_csv, read_from_csv
 import pandas as pd
 
 FILENAME = 'tax_data.csv'
@@ -7,7 +7,7 @@ def main():
     print("Welcome to the Malaysian Tax Input Program!")
 
     user_id = input("Enter your ID: ")
-    ic = input("Enter your 12-digit IC number without hyphen. (Last 4 digits will be your password): ")
+    ic = input("Enter your 12-digit IC number without hyphen. (Last 4 digits will be your password): ").zfill(12)
 
     if not verify_user(ic, ic[-4:]):
         print("Invalid IC format or password!")
@@ -37,7 +37,6 @@ def main():
         'Tax Payable' : tax
     }
 
-    remove_existing_record(ic, FILENAME)
     save_to_csv(data, FILENAME)
 
     print("\nTax Records: ")
