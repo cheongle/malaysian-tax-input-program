@@ -22,7 +22,7 @@ def main():
         ic = input("Enter your 12-digit IC number without hyphen. (Last 4 digits will be your password): ")
 
         if not verify_user(ic, ic[-4:]):
-            print("Invalid IC format or password!\n")
+            print("Invalid IC format!\n")
             continue
 
         is_allowed, is_new_user = check_user_entry(user_id, ic, FILENAME)
@@ -37,16 +37,18 @@ def main():
             print("Welcome back!\n")
         break
     
-    for password in range(3):
+    for attempt in range(3):
         password = input("Enter password: ").strip()
     
         if verify_user(ic, password):
             break
         else:
-            print("Authentication failed. Try Again")
-    else:
-        print("Too many invalid attempts. Exiting the Program...")
-        return
+            remaining = 2 - attempt
+            if remaining > 0:
+                print(f"Authentication failed. You have {remaining} attempt(s) left. Try again.")
+            else:
+                print("Too many invalid attempts. Exiting the Program...")
+                return
     
     while True:
         print("\nWhat would you like to do next?")
@@ -55,28 +57,35 @@ def main():
         next_choice = input("Enter your choice (1 / 2): ").strip()
 
         if next_choice == "1":
-
-            try:
-                income = float(input("Enter your annual income: "))
-                relief_choice = input("Do you want to claim any tax reliefs?\n1. Yes\n2. No\n Enter your choice (1 / 2): ").strip()
-                if relief_choice == "1":
-                    print("*********************************************\nAvailable Tax Relief Categories: ")
-                    user_reliefs = collect_user_reliefs(relief_categories)
-                    if not user_reliefs:
-                        print("No tax reliefs.")
-                        relief = 0
+            while True:
+                try:
+                    income = float(input("Enter your annual income: "))
+                    if income < 0:
+                        print("Income cannot be negative. Please try again.")
                     else:
-                        relief = calculate_relief(user_reliefs)
-                elif relief_choice == "2":
-                    print("Skipping tax reliefs as requested...")
-                    relief = 0
-                else:
-                    print("Invalid choice. Proceeding without tax reliefs.")
-                    relief = 0
+                        break
+                except ValueError:
+                    print("Please enter a valid number.")
 
-            except ValueError:
-                print("Please enter valid numbers.")
-                return
+            print("You are automatically granted RM9,000 individual tax relief as a working adult.")
+            while True: 
+                relief_choice = input("Are you eligible for any other tax reliefs?\n1. Yes\n2. No\n Enter your choice (1 / 2): ").strip()
+                if relief_choice in ("1", "2"):
+                    break
+                else:
+                    print("Invalid choice. Please enter 1 / 2")
+
+            if relief_choice == "1":
+                print("*********************************************\nAvailable Tax Relief Categories: ")
+                user_reliefs = collect_user_reliefs(relief_categories)
+                if not user_reliefs:
+                    print("No tax reliefs.")
+                    relief = 9000
+                else:
+                    relief = calculate_relief(user_reliefs)
+            else:
+                print("Skipping tax reliefs as requested...")
+                relief = 9000
     
             tax = calculate_tax(income, relief)
             print(f"Your tax payable is: RM {tax}")

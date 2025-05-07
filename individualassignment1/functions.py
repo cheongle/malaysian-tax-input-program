@@ -72,7 +72,6 @@ def check_user_entry(user_id, ic_number, filename):
         return False, False
 
 relief_categories = [
-    ("individual", 9000, "fixed"),
     ("spouse", 4000, "fixed"),
     ("child", 8000, "variable"),
     ("medical", 8000, "fixed"),
@@ -84,7 +83,7 @@ relief_categories = [
 valid_relief_categories = {r[0] for r in relief_categories}
 
 def calculate_relief(user_reliefs):
-    total_relief = 0
+    total_relief = 9000
     claimed = set()
 
     for relief_name, amount in user_reliefs.items():
@@ -113,19 +112,46 @@ def collect_user_reliefs(relief_categories):
 
     for idx in selected_indices:
         if 1 <= idx <= len(relief_categories):
-            name, cap, mode = relief_categories[idx - 1]
-            try: 
-                if mode == "variable" and name == "child":
+            name, cap, mode = relief_categories[idx - 1] 
+            if name == "spouse":
+                while True: 
+                    try:
+                        spouse_income = float(input("Enter your spouse's annual income (RM): "))
+                        if spouse_income < 0:
+                            print("Income cannot be negative. Please try again.")
+                        elif spouse_income <= 4000:
+                            user_reliefs[name] = cap
+                            break
+                        else: 
+                            print("Spouse income exceeds RM4,000. Relief not applicable.")
+                            break
+                    except ValueError:
+                        print("Invalid income input. Please try again.")
+                continue
+
+            if mode == "variable" and name == "child":
+                while True:
                     try:
                         children = int(input("Enter number of children (max 12, 8000 each): "))
-                        user_reliefs[name] = children
+                        if children < 0:
+                            print("Number of children cannot be negative. Please try again.")
+                        else:
+                            user_reliefs[name] = children
+                            break
                     except ValueError:
-                        print("Invalid number. Skipped.")
-                else:
-                    amt = float(input(f"Enter amount for {name.capitalize()} relief (Max RM{cap}): "))
-                    user_reliefs[name] = amt
-            except ValueError:
-                print("Invalid input. Amount skipped.")
+                        print("Invalid number. Please enter a whole number.")
+                        
+            else:
+                while True:
+                    try:
+                        amt = float(input(f"Enter amount for {name.capitalize()} relief (Max RM{cap}): "))
+                        if amt < 0:
+                            print("Amount cannot be negative. Please try again.")
+                        else:
+                            user_reliefs[name] = amt
+                            break
+                    except ValueError:
+                        print("Invalid input. Please enter a number.")
         else: 
             print(f"Invalid selection: {idx}")
     return user_reliefs
